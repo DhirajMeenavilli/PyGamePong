@@ -4,6 +4,12 @@ import pygame
 score = 0
 score2 = 0
 
+def interact(paddle,ball):
+    if ball.center[0] > paddle.x and ball.center[0] < (paddle.x + paddle.length):
+        if ball.center[1] > paddle.y - 30 and ball.center[1] < paddle.y + paddle.width + 20:
+            return True
+
+
 def main():
     pygame.init()
     pygame.display.set_mode((500, 400))
@@ -29,9 +35,11 @@ class Game:
         self.close_clicked = False
         self.continue_game = True
         # === game specific objects
-        self.small_dot = Ball('white', 8, [150, 80], [1, 4], self.surface)
+        self.small_dot = Ball('white', 8, [150, 80], [5,5], self.surface)
         self.left_paddle = Paddle('white',50,150,20,80,self.surface)
         self.right_paddle = Paddle('white',420,150,20,80,self.surface)
+        self.contact_paddle_left = Paddle('white', 65, 150, 10, 80, self.surface)
+        self.contact_paddle_right = Paddle('white', 420, 150, 10, 80, self.surface)
         #self.max_frames = 150
         #self.frame_counter = 0
 
@@ -41,6 +49,15 @@ class Game:
         while not self.close_clicked:  # until player clicks close box
             # play frame
             self.handle_events()
+
+            if interact(self.contact_paddle_right,self.small_dot):
+                if self.small_dot.velocity[0] > 0:
+                    self.small_dot.hit()
+
+            if interact(self.contact_paddle_left,self.small_dot):
+                if self.small_dot.velocity[0] < 0:
+                    self.small_dot.hit()
+
             score,score2 = self.small_dot.ScoreUp(score,score2)
             self.draw(score,score2)
             if self.continue_game:
@@ -69,6 +86,8 @@ class Game:
         self.small_dot.draw()
         self.left_paddle.draw()
         self.right_paddle.draw()
+        self.contact_paddle_left.draw()
+        self.contact_paddle_right.draw()
         pygame.display.update()  # make the updated surface appear on the display
 
     def update(self):
@@ -111,7 +130,7 @@ class Ball:
             self.velocity[1] = self.velocity[1] * -1
 
     def hit(self):
-        self.velocity[0] = self.velocity[0] = self.velocity[0] * -1
+        self.velocity[0] = self.velocity[0] * -1
 
     def ScoreUp(self,score,score2):
         if self.center[0] > 490:
@@ -124,6 +143,10 @@ class Ball:
 class Paddle:
     def __init__(self,colour,x,y,length,width,surface):
         self.color = pygame.Color(colour)
+        self.x = x
+        self.y = y
+        self.length = length
+        self.width = width
         self.pos = [x,y]
         self.dim = [length,width]
         self.surface = surface
