@@ -2,7 +2,7 @@ import pygame
 
 # User-defined functions
 score = 0
-score2 = 0
+score2 = 10
 
 def interact(paddle,ball):
     if ball.center[0] > paddle.x and ball.center[0] < (paddle.x + paddle.length):
@@ -59,6 +59,10 @@ class Game:
                     self.small_dot.hit()
 
             score,score2 = self.small_dot.ScoreUp(score,score2)
+
+            if score == 11 or score2 == 11:
+                self.close_clicked = True
+
             self.draw(score,score2)
             if self.continue_game:
                 self.update()
